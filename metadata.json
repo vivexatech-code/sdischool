@@ -1,0 +1,6 @@
+{
+  "name": "Siddhartha International Group of Schools",
+  "description": "Official portal of Siddhartha International Group of Schools across 12 branches in Gurugram, offering CBSE & HBSE curriculum from Play School to Class 12.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

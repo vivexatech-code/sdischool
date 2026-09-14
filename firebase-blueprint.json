@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "assignedBranchId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "Branch": {
+      "collection": "branches",
+      "fields": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "board": { "type": "string" },
+        "classes": { "type": "string" },
+        "medium": { "type": "string" },
+        "description": { "type": "string" },
+        "principalName": { "type": "string" },
+        "principalPhone": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "cloudinaryPublicId": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "facilities": { "type": "array" },
+        "seoTitle": { "type": "string" },
+        "seoDescription": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "Staff": {
+      "collection": "staff",
+      "fields": {
+        "name": { "type": "string" },
+        "designation": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "cloudinaryPublicId": { "type": "string" },
+        "qualification": { "type": "string" },
+        "experience": { "type": "string" },
+        "shortBio": { "type": "string" },
+        "branchId": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "Event": {
+      "collection": "events",
+      "fields": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string" },
+        "branchId": { "type": "string" },
+        "coverImageUrl": { "type": "string" },
+        "cloudinaryPublicId": { "type": "string" },
+        "photos": { "type": "array" },
+        "isPublished": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "GalleryItem": {
+      "collection": "gallery",
+      "fields": {
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "cloudinaryPublicId": { "type": "string" },
+        "caption": { "type": "string" },
+        "branchId": { "type": "string" },
+        "eventId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "Notice": {
+      "collection": "notices",
+      "fields": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "buttonText": { "type": "string" },
+        "buttonUrl": { "type": "string" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "branchId": { "type": "string" },
+        "priority": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      }
+    },
+    "AdmissionEnquiry": {
+      "collection": "enquiries",
+      "fields": {
+        "studentName": { "type": "string" },
+        "parentName": { "type": "string" },
+        "mobile": { "type": "string" },
+        "email": { "type": "string" },
+        "classGrade": { "type": "string" },
+        "preferredBranchId": { "type": "string" },
+        "board": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    },
+    "SiteSettings": {
+      "collection": "siteSettings",
+      "fields": {
+        "schoolName": { "type": "string" },
+        "directorName": { "type": "string" },
+        "directorPhone": { "type": "string" },
+        "managerName": { "type": "string" },
+        "managerPhone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "cloudinaryCloudName": { "type": "string" },
+        "cloudinaryUploadPreset": { "type": "string" }
+      }
+    }
+  }
+}

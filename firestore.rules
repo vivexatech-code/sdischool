@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        getUserData().role == 'super_admin' || 
+        request.auth.uid == 'V53k6fOgFWPArELGnrkiepNySiO2' ||
+        request.auth.token.email == 'testing@vivexatech.in' ||
+        request.auth.token.email == 'admin@siddharthaschools.edu.in' ||
+        request.auth.token.email == 'director@siddharthaschools.edu.in' ||
+        request.auth.token.email == 'vivexatech@gmail.com'
+      );
+    }
+
+    function isBranchAdmin(branchId) {
+      return isAuthenticated() && (
+        isSuperAdmin() || 
+        (getUserData().role == 'branch_admin' && getUserData().assignedBranchId == branchId)
+      );
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+    }
+
+    // Branches
+    match /branches/{branchId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Staff
+    match /staff/{staffId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Events
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Gallery
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Notices
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // Admission Enquiries: anyone can submit, only authenticated admins can read/update
+    match /enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    // Pages & Site Settings & SEO
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /seoSettings/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    match /pages/{docId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+  }
+}
