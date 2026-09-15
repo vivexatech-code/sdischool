@@ -11,7 +11,8 @@ import {
   Phone, 
   Calendar, 
   MapPin, 
-  Shield, 
+  Shield,
+  ShieldCheck, 
   Compass, 
   Users, 
   Laptop, 
@@ -58,65 +59,69 @@ export const HomePage: React.FC = () => {
   return (
     <div className="bg-slate-50 min-h-screen text-slate-800">
       {/* =========================================================================
-          SECTION 1: HERO SECTION
+          SECTION 1: HERO SECTION (Cinematic Editorial Design)
           ========================================================================= */}
       <section 
         id="home-hero-section"
-        className="relative bg-slate-950 text-white pt-16 pb-24 md:pt-24 md:pb-32 overflow-hidden border-b border-slate-800"
+        className="relative bg-slate-950 text-white pt-10 pb-16 md:pt-16 md:pb-28 overflow-hidden border-b border-slate-800"
       >
         {/* Visual Background Elements */}
-        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-25"></div>
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-600/10 via-amber-500/5 to-transparent pointer-events-none"></div>
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
+        <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-sky-600/10 rounded-full blur-[120px] pointer-events-none translate-y-1/3" />
+        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             {/* Left Content Column */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
               {/* Top Trust Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-xs font-semibold tracking-wide">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs font-bold uppercase tracking-wider shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Premier School Group of Gurugram • 12 Branches</span>
+                <span>12 Premier Campuses Across Gurugram, Haryana</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
-                SIDDHARTHA <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200">
-                  INTERNATIONAL
-                </span> <br className="hidden sm:inline" />
-                GROUP OF SCHOOLS
-              </h1>
+              <div className="space-y-3">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
+                  Building <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200">Confident Minds.</span>
+                  <br />
+                  Shaping Bright Futures.
+                </h1>
+                <p className="text-lg sm:text-xl font-medium text-amber-200/90 tracking-wide">
+                  Siddhartha International Group of Schools
+                </p>
+              </div>
 
-              {/* Supporting Message */}
-              <p className="text-lg sm:text-xl text-slate-300 font-medium leading-relaxed max-w-2xl">
-                "Empowering Young Minds for a Brighter Future"
+              {/* Supporting Educational Scope */}
+              <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                Empowering young minds with holistic, values-driven education from <strong className="text-white font-semibold">Play School to Class 12</strong> under dual <strong className="text-white font-semibold">CBSE & HBSE</strong> curriculum frameworks taught entirely in English Medium.
               </p>
 
-              {/* Required Highlights Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-2">
-                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                  <span className="block text-amber-400 font-extrabold text-sm sm:text-base">Play School - 12</span>
-                  <span className="text-[11px] text-slate-400 font-medium">All Grades</span>
+              {/* Hero Badges Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 max-w-xl mx-auto lg:mx-0 text-left">
+                <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-xs">
+                  <div className="text-xl font-extrabold text-amber-400">12</div>
+                  <div className="text-[11px] font-semibold text-slate-300">Gurugram Branches</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                  <span className="block text-amber-400 font-extrabold text-sm sm:text-base">CBSE & HBSE</span>
-                  <span className="text-[11px] text-slate-400 font-medium">Dual Board</span>
+                <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-xs">
+                  <div className="text-xl font-extrabold text-white">Play – XII</div>
+                  <div className="text-[11px] font-semibold text-slate-300">Classes Offered</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                  <span className="block text-amber-400 font-extrabold text-sm sm:text-base">12 Branches</span>
-                  <span className="text-[11px] text-slate-400 font-medium">Across Gurugram</span>
+                <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-xs">
+                  <div className="text-xl font-extrabold text-sky-400">CBSE & HBSE</div>
+                  <div className="text-[11px] font-semibold text-slate-300">Dual Boards</div>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-center">
-                  <span className="block text-amber-400 font-extrabold text-sm sm:text-base">English Medium</span>
-                  <span className="text-[11px] text-slate-400 font-medium">Modern Pedagogy</span>
+                <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-xs">
+                  <div className="text-xl font-extrabold text-emerald-400">English</div>
+                  <div className="text-[11px] font-semibold text-slate-300">Medium of Study</div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4">
                 <Link
                   to="/branches"
-                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm shadow-lg hover:shadow-amber-500/20 transition-all gap-2"
+                  className="px-7 py-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <Building2 className="w-4 h-4" />
                   <span>Explore Our Branches (12)</span>
@@ -124,53 +129,134 @@ export const HomePage: React.FC = () => {
 
                 <button
                   onClick={() => setIsEnquiryModalOpen(true)}
-                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 backdrop-blur-sm transition-all gap-2"
+                  className="px-7 py-4 rounded-2xl bg-slate-900 hover:bg-slate-850 text-white font-bold text-sm border border-slate-700/80 hover:border-amber-400/60 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <Sparkles className="w-4 h-4 text-amber-400" />
+                  <GraduationCap className="w-4 h-4 text-amber-400" />
                   <span>Admission Enquiry</span>
                 </button>
               </div>
 
               {/* Direct Leadership Phone Helpline */}
-              <div className="pt-2 flex items-center gap-4 text-xs text-slate-400 flex-wrap">
-                <span>Director Direct:</span>
-                <a href="tel:8368268149" className="text-amber-300 font-bold hover:underline">
-                  {formatPhone('8368268149')}
-                </a>
-                <span>•</span>
-                <span>Manager Direct:</span>
-                <a href="tel:9355135904" className="text-amber-300 font-bold hover:underline">
-                  {formatPhone('9355135904')}
-                </a>
+              <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 text-xs text-slate-400">
+                <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  Direct Leadership Helplines:
+                </span>
+                <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-slate-200">
+                  <a href="tel:8368268149" className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold">
+                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Director Sandeep Kumar ({formatPhone('8368268149')})</span>
+                  </a>
+                  <span className="hidden sm:inline text-slate-700">•</span>
+                  <a href="tel:9355135904" className="hover:text-amber-400 transition-colors flex items-center gap-1 font-semibold">
+                    <Phone className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Manager Kalpna Kumari ({formatPhone('9355135904')})</span>
+                  </a>
+                </div>
               </div>
             </div>
 
             {/* Right Card / Visual Showcase */}
-            <div className="lg:col-span-5">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-900 group">
-                <img
-                  src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1000&auto=format&fit=crop"
-                  alt="Siddhartha International School Gurugram Campus"
-                  className="w-full h-80 sm:h-96 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+            <div className="lg:col-span-5 relative">
+              <div className="relative mx-auto max-w-lg lg:max-w-none">
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-sky-500/20 rounded-3xl blur-2xl transform scale-95 opacity-60" />
+                
+                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-800/90 bg-slate-900/90 group">
+                  <div className="relative h-[340px] sm:h-[420px] w-full overflow-hidden">
+                    <img
+                      src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1200&auto=format&fit=crop"
+                      alt="Siddhartha International School modern campus and learners"
+                      className="w-full h-full object-cover object-center transform hover:scale-102 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
 
-                <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
-                  <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-amber-500/90 text-slate-950 text-xs font-bold">
-                    <span>Admissions Open 2027-28</span>
+                    <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                      <div className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold flex items-center gap-1.5 shadow-md">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Admissions Open 2027–28</span>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[10px] font-extrabold uppercase tracking-wider shadow-md">
+                        Gurugram Network
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-slate-950/90 backdrop-blur-md border border-slate-800 space-y-2 text-white">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-amber-400 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5" />
+                          12 Branches Across Gurugram
+                        </span>
+                        <span className="text-[11px] text-slate-300 font-mono">Sector 14 to Sohna Rd</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-snug">
+                        Modern infrastructure, smart interactive classrooms, science and robotics laboratories, sports courts, and verified GPS transport.
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold">Holistic Growth in Every Gurugram Neighborhood</h3>
-                  <p className="text-xs text-slate-300 line-clamp-2">
-                    Discover interactive smart classrooms, composite science laboratories, sports arenas, and nurturing educators near your home.
-                  </p>
-                  <div className="pt-2 flex items-center justify-between text-xs">
-                    <span className="text-amber-400 font-semibold">12 Neighborhood Campuses</span>
-                    <Link to="/admissions" className="text-white font-bold flex items-center hover:underline">
-                      Apply Online &rarr;
+
+                  <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-3 text-xs">
+                    <div className="text-slate-300 font-medium">
+                      Looking for the nearest campus?
+                    </div>
+                    <Link
+                      to="/branches"
+                      className="text-amber-400 font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>Locate Campus</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* QUICK FACTS STRIP */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-20">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xl grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+          <div className="flex items-center gap-4 pt-4 sm:pt-0">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">12</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">Gurugram Campuses</div>
+              <div className="text-[11px] text-slate-400">Strategically located across city</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 pt-4 sm:pt-0 sm:pl-8">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200/60 text-sky-600 flex items-center justify-center flex-shrink-0">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">Play – XII</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">Academic Classes</div>
+              <div className="text-[11px] text-slate-400">Play school to senior secondary</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 pt-4 sm:pt-0 sm:pl-8">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200/60 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">2 Boards</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">CBSE & HBSE</div>
+              <div className="text-[11px] text-slate-400">Dual academic pathways</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 pt-4 sm:pt-0 sm:pl-8">
+            <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200/60 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">English</div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">Instruction Medium</div>
+              <div className="text-[11px] text-slate-400">Holistic & values-driven</div>
             </div>
           </div>
         </div>
