@@ -16,8 +16,10 @@ interface AuthContextType {
   loading: boolean;
   isSuperAdmin: boolean;
   isBranchAdmin: boolean;
+  error?: string | null;
   login: (email: string, pass: string) => Promise<void>;
   loginAsDemoAdmin: () => Promise<void>;
+  demoLogin: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -120,8 +122,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         isSuperAdmin,
         isBranchAdmin,
+        error: null,
         login,
         loginAsDemoAdmin,
+        demoLogin: loginAsDemoAdmin,
         logout,
       }}
     >

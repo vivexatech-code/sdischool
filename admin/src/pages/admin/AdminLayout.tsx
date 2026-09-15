@@ -26,7 +26,7 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const pendingEnquiriesCount = enquiries.filter(e => e.status === 'New').length;
+  const pendingEnquiriesCount = enquiries.filter(e => e.status === 'New' || e.status === 'new').length;
 
   const handleLogout = async () => {
     await logout();

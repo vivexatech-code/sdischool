@@ -4,7 +4,11 @@ import { Phone, Mail, MapPin, Building2, Shield, Heart } from 'lucide-react';
 import { useSite } from '../../contexts/SiteContext';
 import { formatPhone } from '../../lib/utils';
 
-export const Footer: React.FC = () => {
+export interface FooterProps {
+  onOpenEnquiry?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenEnquiry }) => {
   const { branches, siteSettings } = useSite();
 
   return (
