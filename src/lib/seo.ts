@@ -169,7 +169,7 @@ export function getEventStructuredData(event: {
   title: string;
   description: string;
   date: string;
-  venue: string;
+  venue?: string;
   imageUrl?: string;
   slug: string;
 }) {
@@ -185,7 +185,7 @@ export function getEventStructuredData(event: {
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {
       '@type': 'Place',
-      name: event.venue,
+      name: event.venue || 'Siddhartha International School Campus, Gurugram',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Gurugram',

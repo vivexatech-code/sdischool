@@ -31,16 +31,20 @@ export interface Branch {
 export interface Staff {
   id: string;
   name: string;
-  designation: 'Principal' | 'Vice Principal' | 'Coordinator' | 'Teacher' | 'Administrative Staff' | 'Other Staff';
+  role?: string;
+  designation: 'Principal' | 'Vice Principal' | 'Coordinator' | 'Teacher' | 'Administrative Staff' | 'Other Staff' | string;
   photoUrl: string;
   cloudinaryPublicId?: string;
   qualification: string;
-  experience: string;
-  shortBio: string;
+  experience?: string | number;
+  shortBio?: string;
   branchId: string;
   branchName?: string;
-  displayOrder: number;
-  isActive: boolean;
+  phone?: string;
+  email?: string;
+  displayOrder?: number;
+  isActive?: boolean;
+  isLeadership?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -50,14 +54,19 @@ export interface SchoolEvent {
   title: string;
   slug: string;
   description: string;
+  fullDescription?: string;
   date: string;
+  endDate?: string;
+  venue?: string;
   branchId?: string; // 'all' or specific branchId
   branchName?: string;
-  coverImageUrl: string;
+  coverImageUrl?: string;
+  imageUrl?: string;
   cloudinaryPublicId?: string;
-  photos: string[];
-  isPublished: boolean;
-  category?: string;
+  photos?: string[];
+  isPublished?: boolean;
+  category?: 'Sports' | 'Academic' | 'Cultural' | 'Celebration' | 'Workshop' | 'Competition' | string;
+  isUpcoming?: boolean;
   createdAt?: string;
 }
 
@@ -72,6 +81,7 @@ export interface GalleryItem {
   eventId?: string;
   eventName?: string;
   category?: string;
+  uploadedAt?: string;
   createdAt?: string;
 }
 
@@ -87,8 +97,10 @@ export interface Notice {
   endDate: string;
   branchId?: string; // 'all' or specific branchId
   branchName?: string;
-  priority: 'Urgent' | 'High' | 'Normal';
+  priority: 'Urgent' | 'High' | 'Normal' | 'low' | 'normal' | 'urgent' | string;
   isActive: boolean;
+  publishedDate?: string;
+  date?: string;
   createdAt?: string;
 }
 
@@ -103,7 +115,7 @@ export interface AdmissionEnquiry {
   preferredBranchName?: string;
   board: string;
   message?: string;
-  status: 'new' | 'contacted' | 'follow_up' | 'converted' | 'closed';
+  status: 'new' | 'contacted' | 'follow_up' | 'converted' | 'closed' | 'New' | 'Contacted' | 'Closed' | string;
   adminNotes?: string;
   createdAt: string;
   updatedAt?: string;
@@ -118,6 +130,9 @@ export interface SiteSettings {
   managerPhone: string;
   primaryEmail: string;
   headOfficeAddress: string;
+  headquartersCity?: string;
+  totalBranches?: number;
+  metaDescription?: string;
   cloudinaryCloudName?: string;
   cloudinaryUploadPreset?: string;
   facebookUrl?: string;

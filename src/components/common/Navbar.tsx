@@ -19,13 +19,25 @@ import { useSite } from '../../contexts/SiteContext';
 import { EnquiryModal } from './EnquiryModal';
 import { formatPhone } from '../../lib/utils';
 
-export const Navbar: React.FC = () => {
+export interface NavbarProps {
+  onOpenEnquiry?: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenEnquiry }) => {
   const { branches, notices, siteSettings } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [branchesDropdownOpen, setBranchesDropdownOpen] = useState(false);
   const [academicsDropdownOpen, setAcademicsDropdownOpen] = useState(false);
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
   const location = useLocation();
+
+  const handleOpenEnquiry = () => {
+    if (onOpenEnquiry) {
+      onOpenEnquiry();
+    } else {
+      setIsEnquiryOpen(true);
+    }
+  };
 
   const activeNotice = notices.find(n => n.isActive && n.priority === 'Urgent') || notices.find(n => n.isActive);
 
@@ -306,7 +318,7 @@ export const Navbar: React.FC = () => {
             <div className="hidden sm:flex items-center gap-3">
               <button
                 id="header-admission-enquiry-btn"
-                onClick={() => setIsEnquiryOpen(true)}
+                onClick={handleOpenEnquiry}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition-all"
               >
                 <Sparkles className="w-4 h-4 text-amber-200" />
@@ -317,7 +329,7 @@ export const Navbar: React.FC = () => {
             {/* Mobile Menu Button */}
             <div className="flex items-center gap-2 xl:hidden">
               <button
-                onClick={() => setIsEnquiryOpen(true)}
+                onClick={handleOpenEnquiry}
                 className="sm:hidden px-3 py-1.5 text-xs font-bold rounded-lg bg-amber-600 text-white"
               >
                 Enquire
