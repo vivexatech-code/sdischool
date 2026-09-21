@@ -13,7 +13,8 @@ import {
   Calendar, 
   Award,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 import { getBranches, getBranchBySlug } from '@/lib/firestore';
 import { formatPhone } from '@/lib/utils';
@@ -179,17 +180,30 @@ export default async function BranchDetailPage({ params }: Props) {
 
             {/* Location & Map Section */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <h2 className="text-xl font-bold text-slate-900">Campus Location & Route</h2>
-                <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(branch.address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-bold text-amber-700 hover:underline inline-flex items-center gap-1"
-                >
-                  <span>Open in Google Maps</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {branch.businessProfileUrl && (
+                    <a
+                      href={branch.businessProfileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-blue-700 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 inline-flex items-center gap-1.5 transition-colors"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-blue-600" />
+                      <span>View on Google</span>
+                    </a>
+                  )}
+                  <a
+                    href={branch.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(branch.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-amber-700 hover:underline inline-flex items-center gap-1"
+                  >
+                    <span>Open in Google Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </div>
               <p className="text-xs text-slate-600">{branch.address}</p>
 
@@ -277,6 +291,18 @@ export default async function BranchDetailPage({ params }: Props) {
               >
                 Submit Admission Form Online
               </Link>
+
+              {branch.businessProfileUrl && (
+                <a
+                  href={branch.businessProfileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 rounded-xl border border-blue-200 bg-blue-50/80 hover:bg-blue-100 text-blue-900 font-bold text-xs text-center flex items-center justify-center gap-2 shadow-xs transition-colors"
+                >
+                  <Globe className="w-4 h-4 text-blue-600" />
+                  <span>View on Google (Reviews & Map)</span>
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -19,9 +19,11 @@ export interface Branch {
   latitude?: number;
   longitude?: number;
   googleMapsUrl?: string;
+  businessProfileUrl?: string;
   facilities: string[];
   seoTitle?: string;
   seoDescription?: string;
+  seoImage?: string;
   isActive: boolean;
   isPlaceholder?: boolean;
   createdAt?: string;

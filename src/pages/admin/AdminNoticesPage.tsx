@@ -3,6 +3,7 @@ import { useSite } from '../../contexts/SiteContext';
 import { Notice } from '../../types';
 import { formatDate } from '../../lib/utils';
 import { Bell, Plus, Edit, Trash2, Building2, X, AlertCircle } from 'lucide-react';
+import { ImageUpload } from '../../components/admin/ImageUpload';
 
 export const AdminNoticesPage: React.FC = () => {
   const { notices, branches, saveNotice, removeNotice } = useSite();
@@ -254,6 +255,22 @@ export const AdminNoticesPage: React.FC = () => {
                   />
                 </div>
               </div>
+
+              <ImageUpload
+                label="Circular Attachment / Banner Image (Optional)"
+                helperText="Upload official circular scan, poster, or document image. JPG, PNG, WEBP (up to 10MB)"
+                aspectRatio="video"
+                value={editingNotice.imageUrl || ''}
+                publicId={editingNotice.cloudinaryPublicId || ''}
+                folder="schools/notices"
+                onChange={({ imageUrl, cloudinaryPublicId }) => {
+                  setEditingNotice(prev => prev ? ({
+                    ...prev,
+                    imageUrl,
+                    cloudinaryPublicId: cloudinaryPublicId || prev.cloudinaryPublicId
+                  }) : null);
+                }}
+              />
 
               <div className="flex items-center gap-2 pt-1">
                 <input

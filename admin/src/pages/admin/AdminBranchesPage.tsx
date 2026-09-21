@@ -12,9 +12,15 @@ import {
   ExternalLink, 
   X, 
   Check, 
-  AlertCircle 
+  AlertCircle,
+  GraduationCap,
+  Compass,
+  FileText,
+  Search,
+  Globe
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ImageUpload } from '../../components/admin/ImageUpload';
 
 export const AdminBranchesPage: React.FC = () => {
   const { branches, saveBranch, removeBranch } = useSite();
@@ -23,6 +29,7 @@ export const AdminBranchesPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [facilitiesInput, setFacilitiesInput] = useState('');
+  const [urlValidationError, setUrlValidationError] = useState<string | null>(null);
 
   const openNewBranchModal = () => {
     setEditingBranch({
@@ -36,39 +43,85 @@ export const AdminBranchesPage: React.FC = () => {
       board: 'CBSE & HBSE',
       medium: 'English',
       description: '',
+      googleMapsUrl: '',
+      businessProfileUrl: '',
       principalName: '',
       principalQualification: 'M.Sc., M.Ed.',
       principalPhone: '8368268149',
       facilities: ['Smart Classrooms', 'Composite Science Lab', 'Sports Ground', 'GPS Bus Fleet'],
-      imageUrl: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop',
+      imageUrl: '',
+      cloudinaryPublicId: '',
       seoTitle: '',
       seoDescription: '',
+      seoImage: '',
     });
     setFacilitiesInput('Smart Classrooms, Composite Science Lab, Sports Ground, GPS Bus Fleet');
+    setUrlValidationError(null);
     setIsModalOpen(true);
   };
 
   const openEditBranchModal = (b: Branch) => {
-    setEditingBranch(b);
+    setEditingBranch({
+      ...b,
+      businessProfileUrl: b.businessProfileUrl || '',
+      googleMapsUrl: b.googleMapsUrl || '',
+      cloudinaryPublicId: b.cloudinaryPublicId || '',
+      seoTitle: b.seoTitle || '',
+      seoDescription: b.seoDescription || '',
+      seoImage: b.seoImage || '',
+      medium: b.medium || 'English',
+    });
     setFacilitiesInput(b.facilities ? b.facilities.join(', ') : '');
+    setUrlValidationError(null);
     setIsModalOpen(true);
+  };
+
+  const validateUrl = (url?: string): boolean => {
+    if (!url || !url.trim()) return true;
+    const trimmed = url.trim();
+    return (
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('maps.app.goo.gl') ||
+      trimmed.startsWith('g.page')
+    );
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBranch || !editingBranch.name || !editingBranch.sector) return;
 
+    // Validate Business Profile URL format if provided
+    if (editingBranch.businessProfileUrl && !validateUrl(editingBranch.businessProfileUrl)) {
+      setUrlValidationError('Please enter a valid URL (starting with https:// or http://)');
+      return;
+    }
+
     try {
       setSaving(true);
+      setUrlValidationError(null);
       const generatedSlug = editingBranch.slug || slugify(`${editingBranch.name} ${editingBranch.sector}`);
       const facilitiesArray = facilitiesInput
         .split(',')
         .map(f => f.trim())
         .filter(Boolean);
 
+      // Ensure full URL formatting if prefix was omitted
+      let formattedBusinessUrl = editingBranch.businessProfileUrl?.trim() || '';
+      if (formattedBusinessUrl && !/^https?:\/\//i.test(formattedBusinessUrl)) {
+        formattedBusinessUrl = `https://${formattedBusinessUrl}`;
+      }
+
+      let formattedMapsUrl = editingBranch.googleMapsUrl?.trim() || '';
+      if (formattedMapsUrl && !/^https?:\/\//i.test(formattedMapsUrl)) {
+        formattedMapsUrl = `https://${formattedMapsUrl}`;
+      }
+
       await saveBranch({
         ...editingBranch,
         slug: generatedSlug,
+        businessProfileUrl: formattedBusinessUrl,
+        googleMapsUrl: formattedMapsUrl,
         facilities: facilitiesArray,
       } as Branch);
 
@@ -96,7 +149,7 @@ export const AdminBranchesPage: React.FC = () => {
             Branch Management
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage all 12 Gurugram campuses, principal details, facilities, and SEO settings.
+            Manage all Gurugram campuses, direct image uploads, Google Business Profiles, facilities, and SEO.
           </p>
         </div>
 
@@ -126,9 +179,9 @@ export const AdminBranchesPage: React.FC = () => {
             >
               <div className="flex items-start gap-4">
                 <img
-                  src={branch.imageUrl}
+                  src={branch.imageUrl || 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=800&auto=format&fit=crop'}
                   alt={branch.name}
-                  className="w-16 h-16 rounded-xl object-cover border border-slate-200 flex-shrink-0"
+                  className="w-16 h-16 rounded-xl object-cover border border-slate-200 flex-shrink-0 bg-slate-100"
                 />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -139,6 +192,12 @@ export const AdminBranchesPage: React.FC = () => {
                     <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px] uppercase">
                       {branch.board}
                     </span>
+                    {branch.businessProfileUrl && (
+                      <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[10px] flex items-center gap-1">
+                        <Globe className="w-3 h-3" />
+                        <span>Google Profile Linked</span>
+                      </span>
+                    )}
                   </div>
 
                   <p className="text-xs text-slate-500 line-clamp-1">{branch.address}</p>
@@ -152,6 +211,19 @@ export const AdminBranchesPage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+                {branch.businessProfileUrl && (
+                  <a
+                    href={branch.businessProfileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-semibold flex items-center gap-1 border border-blue-200"
+                    title="View on Google Business Profile"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Google</span>
+                  </a>
+                )}
+
                 <Link
                   to={`/branches/${branch.slug}`}
                   target="_blank"
@@ -186,201 +258,346 @@ export const AdminBranchesPage: React.FC = () => {
       {/* Edit / Add Modal */}
       {isModalOpen && editingBranch && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-6">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h2 className="text-xl font-bold text-slate-900">
-                {editingBranch.id ? `Edit ${editingBranch.name}` : 'Add New Gurugram Branch'}
-              </h2>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">
+                  {editingBranch.id ? `Edit ${editingBranch.name}` : 'Add New Gurugram Campus'}
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Complete branch identity, direct Cloudinary photo upload, Google links, and curriculum details.
+                </p>
+              </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-700"
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSave} className="space-y-6 text-xs">
+              {/* 1. Basic Information */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <Building2 className="w-4 h-4 text-amber-600" />
+                  <span>Basic Information</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-700 mb-1">Branch Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingBranch.name || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, name: e.target.value })}
+                      placeholder="e.g. Siddhartha International School"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Sector / Locality *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingBranch.sector || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, sector: e.target.value })}
+                      placeholder="e.g. Sector 14"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Branch Slug (URL)</label>
+                    <input
+                      type="text"
+                      value={editingBranch.slug || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, slug: e.target.value })}
+                      placeholder="auto-generated from name"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Helpline Phone *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingBranch.phone || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, phone: e.target.value })}
+                      placeholder="e.g. 8368268149"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Branch Email Address</label>
+                    <input
+                      type="email"
+                      value={editingBranch.email || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, email: e.target.value })}
+                      placeholder="branch@siddharthaschools.edu.in"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Branch Name *</label>
+                  <label className="block font-bold text-slate-700 mb-1">Full Campus Address *</label>
                   <input
                     type="text"
                     required
-                    value={editingBranch.name || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, name: e.target.value })}
-                    placeholder="e.g. Siddhartha International School"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Sector / Locality *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingBranch.sector || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, sector: e.target.value })}
-                    placeholder="e.g. Sector 14"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">SEO URL Slug</label>
-                  <input
-                    type="text"
-                    value={editingBranch.slug || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, slug: e.target.value })}
-                    placeholder="auto-generated if left empty"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Board Affiliation</label>
-                  <select
-                    value={editingBranch.board || 'CBSE & HBSE'}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, board: e.target.value as 'CBSE' | 'HBSE' | 'CBSE & HBSE' })}
+                    value={editingBranch.address || ''}
+                    onChange={(e) => setEditingBranch({ ...editingBranch, address: e.target.value })}
+                    placeholder="Sector / Road, Gurugram, Haryana"
                     className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
-                  >
-                    <option value="CBSE & HBSE">CBSE & HBSE</option>
-                    <option value="CBSE">CBSE</option>
-                    <option value="HBSE">HBSE</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Classes Offered</label>
-                  <input
-                    type="text"
-                    value={editingBranch.classes || 'Play School to Class 12'}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, classes: e.target.value })}
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Full Campus Address *</label>
-                <input
-                  type="text"
-                  required
-                  value={editingBranch.address || ''}
-                  onChange={(e) => setEditingBranch({ ...editingBranch, address: e.target.value })}
-                  placeholder="Street, Sector, Gurugram, Haryana"
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                />
-              </div>
+              {/* 2. Academic Information */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <GraduationCap className="w-4 h-4 text-amber-600" />
+                  <span>Academic Information</span>
+                </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Branch Phone Helpline *</label>
-                  <input
-                    type="text"
-                    required
-                    value={editingBranch.phone || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, phone: e.target.value })}
-                    placeholder="e.g. 8368268149"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Board Affiliation</label>
+                    <select
+                      value={editingBranch.board || 'CBSE & HBSE'}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, board: e.target.value as any })}
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    >
+                      <option value="CBSE & HBSE">CBSE & HBSE</option>
+                      <option value="CBSE">CBSE</option>
+                      <option value="HBSE">HBSE</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Branch Email Address</label>
-                  <input
-                    type="email"
-                    value={editingBranch.email || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, email: e.target.value })}
-                    placeholder="branch@siddharthaschools.edu.in"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-              </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Classes Offered</label>
+                    <input
+                      type="text"
+                      value={editingBranch.classes || 'Play School to Class 12'}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, classes: e.target.value })}
+                      placeholder="e.g. Play School to Class 12"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Principal Name</label>
-                  <input
-                    type="text"
-                    value={editingBranch.principalName || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, principalName: e.target.value })}
-                    placeholder="Principal's full name"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Principal Qualification</label>
-                  <input
-                    type="text"
-                    value={editingBranch.principalQualification || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, principalQualification: e.target.value })}
-                    placeholder="M.Sc., M.Ed., Ph.D."
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Principal Phone</label>
-                  <input
-                    type="text"
-                    value={editingBranch.principalPhone || ''}
-                    onChange={(e) => setEditingBranch({ ...editingBranch, principalPhone: e.target.value })}
-                    placeholder="Direct mobile"
-                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  />
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Medium of Instruction</label>
+                    <input
+                      type="text"
+                      value={editingBranch.medium || 'English'}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, medium: e.target.value })}
+                      placeholder="e.g. English"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Campus Image URL</label>
-                <input
-                  type="text"
+              {/* 3. Location & Google Business Profile */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <Compass className="w-4 h-4 text-amber-600" />
+                  <span>Location & Google Profile</span>
+                </h3>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Business Profile Link
+                      <span className="font-normal text-slate-500 ml-1">(Google Business Profile / Maps Listing)</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="url"
+                        value={editingBranch.businessProfileUrl || ''}
+                        onChange={(e) => {
+                          setEditingBranch({ ...editingBranch, businessProfileUrl: e.target.value });
+                          if (urlValidationError) setUrlValidationError(null);
+                        }}
+                        placeholder="https://www.google.com/maps/place/... or https://g.page/..."
+                        className={`w-full px-3 py-2 text-xs border rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white ${
+                          urlValidationError ? 'border-rose-300 ring-rose-200' : 'border-slate-300'
+                        }`}
+                      />
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      This link enables the &quot;View on Google&quot; button on public campus pages so families can see verified reviews, ratings, and directions.
+                    </p>
+                    {urlValidationError && (
+                      <p className="text-[11px] text-rose-600 font-medium mt-1">{urlValidationError}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Google Maps Location URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editingBranch.googleMapsUrl || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, googleMapsUrl: e.target.value })}
+                      placeholder="https://maps.google.com/?q=..."
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Branch Image: Direct Image Upload */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <Building2 className="w-4 h-4 text-amber-600" />
+                  <span>Branch Image</span>
+                </h3>
+
+                <ImageUpload
+                  label="Upload Campus Image"
+                  helperText="Drag & drop or click to browse. JPG, PNG, WEBP (up to 10MB)"
                   value={editingBranch.imageUrl || ''}
-                  onChange={(e) => setEditingBranch({ ...editingBranch, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  publicId={editingBranch.cloudinaryPublicId || ''}
+                  folder="schools/branches"
+                  aspectRatio="video"
+                  onChange={({ imageUrl, cloudinaryPublicId }) => {
+                    setEditingBranch(prev => prev ? ({
+                      ...prev,
+                      imageUrl,
+                      cloudinaryPublicId: cloudinaryPublicId || prev.cloudinaryPublicId
+                    }) : null);
+                  }}
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Facilities (comma-separated)</label>
-                <input
-                  type="text"
-                  value={facilitiesInput}
-                  onChange={(e) => setFacilitiesInput(e.target.value)}
-                  placeholder="Smart Classrooms, Composite Science Lab, Sports Arena, GPS Bus Fleet"
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                />
+              {/* 5. Description & Leadership */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <FileText className="w-4 h-4 text-amber-600" />
+                  <span>Description & Branch Leadership</span>
+                </h3>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">About this Campus</label>
+                  <textarea
+                    rows={3}
+                    value={editingBranch.description || ''}
+                    onChange={(e) => setEditingBranch({ ...editingBranch, description: e.target.value })}
+                    placeholder="Overview of this campus's academic environment, history, and achievements..."
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Campus Facilities (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={facilitiesInput}
+                    onChange={(e) => setFacilitiesInput(e.target.value)}
+                    placeholder="Smart Classrooms, Composite Science Lab, Sports Arena, GPS Bus Fleet"
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-200">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Principal Name</label>
+                    <input
+                      type="text"
+                      value={editingBranch.principalName || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, principalName: e.target.value })}
+                      placeholder="Principal full name"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Principal Qualification</label>
+                    <input
+                      type="text"
+                      value={editingBranch.principalQualification || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, principalQualification: e.target.value })}
+                      placeholder="M.Sc., M.Ed., Ph.D."
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">Principal Direct Phone</label>
+                    <input
+                      type="text"
+                      value={editingBranch.principalPhone || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, principalPhone: e.target.value })}
+                      placeholder="Direct mobile"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">About this Campus</label>
-                <textarea
-                  rows={3}
-                  value={editingBranch.description || ''}
-                  onChange={(e) => setEditingBranch({ ...editingBranch, description: e.target.value })}
-                  placeholder="Overview of this branch's academic environment, achievements..."
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                />
+              {/* 6. SEO & Metadata */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
+                  <Search className="w-4 h-4 text-amber-600" />
+                  <span>SEO & Social Share</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">SEO Page Title</label>
+                    <input
+                      type="text"
+                      value={editingBranch.seoTitle || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, seoTitle: e.target.value })}
+                      placeholder="e.g. Best CBSE School in Sector 14 Gurugram"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">SEO Description</label>
+                    <input
+                      type="text"
+                      value={editingBranch.seoDescription || ''}
+                      onChange={(e) => setEditingBranch({ ...editingBranch, seoDescription: e.target.value })}
+                      placeholder="Admissions open for Play School to Class 12..."
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+              {/* Form Action Controls */}
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50"
+                  disabled={saving}
+                  className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-xs transition-colors disabled:opacity-50"
+                  className="px-7 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-md transition-all disabled:opacity-50 flex items-center gap-2"
                 >
-                  {saving ? 'Saving...' : 'Save Campus'}
+                  {saving ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Saving Campus...</span>
+                    </>
+                  ) : (
+                    <span>Save Campus Changes</span>
+                  )}
                 </button>
               </div>
             </form>

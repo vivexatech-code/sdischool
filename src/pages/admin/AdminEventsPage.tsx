@@ -3,6 +3,7 @@ import { useSite } from '../../contexts/SiteContext';
 import { SchoolEvent } from '../../types';
 import { slugify, formatDate } from '../../lib/utils';
 import { Calendar, Plus, Edit, Trash2, Building2, MapPin, X } from 'lucide-react';
+import { ImageUpload } from '../../components/admin/ImageUpload';
 
 export const AdminEventsPage: React.FC = () => {
   const { events, branches, saveEvent, removeEvent } = useSite();
@@ -20,7 +21,8 @@ export const AdminEventsPage: React.FC = () => {
       category: 'Celebration',
       branchId: 'all',
       description: '',
-      imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop',
+      imageUrl: '',
+      cloudinaryPublicId: '',
     });
     setIsModalOpen(true);
   };
@@ -239,16 +241,21 @@ export const AdminEventsPage: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={editingEvent.imageUrl || ''}
-                  onChange={(e) => setEditingEvent({ ...editingEvent, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                />
-              </div>
+              <ImageUpload
+                label="Event Banner / Cover Image"
+                helperText="Upload event photo or promotional creative. JPG, PNG, WEBP (up to 10MB)"
+                aspectRatio="video"
+                value={editingEvent.imageUrl || ''}
+                publicId={editingEvent.cloudinaryPublicId || ''}
+                folder="schools/events"
+                onChange={({ imageUrl, cloudinaryPublicId }) => {
+                  setEditingEvent(prev => prev ? ({
+                    ...prev,
+                    imageUrl,
+                    cloudinaryPublicId: cloudinaryPublicId || prev.cloudinaryPublicId
+                  }) : null);
+                }}
+              />
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Description</label>

@@ -20,7 +20,8 @@ import {
   ExternalLink,
   ChevronRight,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Globe
 } from 'lucide-react';
 
 export const BranchDetailPage: React.FC = () => {
@@ -175,6 +176,18 @@ export const BranchDetailPage: React.FC = () => {
                 <Phone className="w-3.5 h-3.5 text-amber-600" />
                 <span>Call Campus: {formatPhone(branch.phone)}</span>
               </a>
+
+              {branch.businessProfileUrl && (
+                <a
+                  href={branch.businessProfileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 rounded-xl border border-blue-200 bg-blue-50/80 hover:bg-blue-100 text-blue-900 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-xs"
+                >
+                  <Globe className="w-4 h-4 text-blue-600" />
+                  <span>View on Google (Reviews & Profile)</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -307,15 +320,28 @@ export const BranchDetailPage: React.FC = () => {
               <h3 className="text-xl font-bold text-slate-900">Campus Location & Directions</h3>
               <p className="text-xs text-slate-500 mt-1">{branch.address}</p>
             </div>
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.name + ' ' + branch.address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold self-start"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-amber-600" />
-              <span>Open in Google Maps</span>
-            </a>
+            <div className="flex items-center gap-2 self-start flex-wrap">
+              {branch.businessProfileUrl && (
+                <a
+                  href={branch.businessProfileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-xs font-bold"
+                >
+                  <Globe className="w-3.5 h-3.5 text-blue-600" />
+                  <span>View on Google</span>
+                </a>
+              )}
+              <a
+                href={branch.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.name + ' ' + branch.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-amber-600" />
+                <span>Open in Google Maps</span>
+              </a>
+            </div>
           </div>
 
           <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-64 flex items-center justify-center relative">

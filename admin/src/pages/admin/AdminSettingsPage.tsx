@@ -168,6 +168,47 @@ export const AdminSettingsPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Media & Image Storage Configuration */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Settings className="w-4 h-4 text-amber-600" />
+              <span>Media & Image CDN Delivery (Optional)</span>
+            </h3>
+            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
+              Active (In-browser Compression)
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-500 leading-relaxed">
+            All images uploaded across the portal are automatically compressed client-side to lightweight, high-performance WebP formats with zero external dependencies. If your school has an existing Cloudinary account, you can optionally configure your Cloud Name and unsigned Upload Preset below.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Cloudinary Cloud Name</label>
+              <input
+                type="text"
+                placeholder="e.g., your-cloud-name"
+                value={formState.cloudinaryCloudName || ''}
+                onChange={(e) => setFormState({ ...formState, cloudinaryCloudName: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-slate-700 mb-1">Unsigned Upload Preset</label>
+              <input
+                type="text"
+                placeholder="e.g., ml_default or school_preset"
+                value={formState.cloudinaryUploadPreset || ''}
+                onChange={(e) => setFormState({ ...formState, cloudinaryUploadPreset: e.target.value })}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Submit Button */}
         <div className="flex justify-end">
           <button

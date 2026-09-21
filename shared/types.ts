@@ -14,11 +14,13 @@ export interface Branch {
   streams?: string[]; // e.g. ["Science (Medical & Non-Medical)", "Commerce", "Arts/Humanities"]
   facilities: string[];
   imageUrl: string;
+  cloudinaryPublicId?: string;
   principalName?: string;
   principalPhone?: string;
   principalQualification?: string;
   principalMessage?: string;
   googleMapsUrl?: string;
+  businessProfileUrl?: string;
   latitude?: number;
   longitude?: number;
   coordinates?: {

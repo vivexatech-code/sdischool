@@ -2,35 +2,59 @@ import React, { useState } from 'react';
 import { useSite } from '../../contexts/SiteContext';
 import { GalleryItem } from '../../types';
 import { ImageIcon, Plus, Trash2, X, Building2 } from 'lucide-react';
+import { ImageUpload } from '../../components/admin/ImageUpload';
 
 export const AdminGalleryPage: React.FC = () => {
   const { gallery, branches, saveGalleryItem, removeGalleryItem } = useSite();
 
   const [title, setTitle] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState('');
   const [category, setCategory] = useState('Campus');
   const [branchId, setBranchId] = useState(branches[0]?.id || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleOpenModal = () => {
+    setTitle('');
+    setImageUrl('');
+    setCloudinaryPublicId('');
+    setCategory('Campus');
+    setBranchId(branches[0]?.id || '');
+    setError(null);
+    setIsModalOpen(true);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !imageUrl.trim()) return;
+    if (!title.trim()) {
+      setError('Please provide an image caption / title.');
+      return;
+    }
+    if (!imageUrl.trim()) {
+      setError('Please upload an image first.');
+      return;
+    }
 
     try {
       setSaving(true);
+      setError(null);
       await saveGalleryItem({
         title: title.trim(),
         imageUrl: imageUrl.trim(),
+        cloudinaryPublicId: cloudinaryPublicId.trim() || undefined,
         category,
         branchId,
         uploadedAt: new Date().toISOString(),
       });
       setTitle('');
       setImageUrl('');
+      setCloudinaryPublicId('');
       setIsModalOpen(false);
     } catch (err) {
       console.error(err);
+      setError('Failed to save gallery item. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -50,12 +74,12 @@ export const AdminGalleryPage: React.FC = () => {
             Photo Gallery Media
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Manage pictures shown on the public gallery page and branch profiles.
+            Manage pictures shown on the public gallery page and branch profiles with direct Cloudinary uploads.
           </p>
         </div>
 
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenModal}
           className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-2 self-start sm:self-auto shadow-sm"
         >
           <Plus className="w-4 h-4" />
@@ -76,7 +100,7 @@ export const AdminGalleryPage: React.FC = () => {
                 />
                 <button
                   onClick={() => handleDelete(item.id, item.title)}
-                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-600 text-white hover:bg-rose-700 opacity-90 hover:opacity-100 shadow-md"
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-rose-600 text-white hover:bg-rose-700 opacity-90 hover:opacity-100 shadow-md transition-opacity"
                   title="Delete image"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -101,14 +125,20 @@ export const AdminGalleryPage: React.FC = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 className="text-lg font-bold text-slate-900">Add Gallery Image</h2>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {error && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl font-medium">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSave} className="space-y-4 text-xs">
               <div>
@@ -123,17 +153,19 @@ export const AdminGalleryPage: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Image URL (Cloudinary or Direct) *</label>
-                <input
-                  type="text"
-                  required
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                />
-              </div>
+              <ImageUpload
+                label="Direct Image Upload *"
+                helperText="Drag & drop or click to browse. JPG, PNG, WEBP (up to 10MB)"
+                aspectRatio="video"
+                value={imageUrl}
+                publicId={cloudinaryPublicId}
+                folder="schools/gallery"
+                onChange={({ imageUrl: newUrl, cloudinaryPublicId: newId }) => {
+                  setImageUrl(newUrl);
+                  setCloudinaryPublicId(newId || '');
+                  if (error) setError(null);
+                }}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -165,20 +197,20 @@ export const AdminGalleryPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-3">
+              <div className="pt-3 flex justify-end gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700"
+                  className="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 font-semibold hover:bg-slate-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
-                  className="px-5 py-2 bg-amber-600 text-white rounded-lg font-bold"
+                  disabled={saving || !imageUrl}
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow-xs disabled:opacity-50"
                 >
-                  {saving ? 'Saving...' : 'Add Image'}
+                  {saving ? 'Saving...' : 'Add Image to Gallery'}
                 </button>
               </div>
             </form>

@@ -91,8 +91,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
   managerPhone: '9355135904',
   primaryEmail: 'info@siddharthaschools.edu.in',
   headOfficeAddress: 'Sector 14, Gurugram, Haryana 122001, India',
-  cloudinaryCloudName: 'siddhartha-schools',
-  cloudinaryUploadPreset: 'school_uploads',
+  cloudinaryCloudName: '',
+  cloudinaryUploadPreset: '',
 };
 
 const DEFAULT_SEO: SeoSettings = {
