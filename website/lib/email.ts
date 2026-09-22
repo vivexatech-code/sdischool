@@ -1,5 +1,3 @@
-import { Resend } from 'resend';
-
 export interface FormNotificationPayload {
   formType: 'admission' | 'quick_enquiry' | 'branch_enquiry' | 'contact';
   studentName?: string;
@@ -24,17 +22,9 @@ export interface EmailSendResult {
   skipped?: boolean;
 }
 
-let resendInstance: Resend | null = null;
-
-function getResendClient(): Resend | null {
+function getResendApiKey(): string | null {
   const apiKey = process.env.RESEND_API_KEY?.trim();
-  if (!apiKey) {
-    return null;
-  }
-  if (!resendInstance) {
-    resendInstance = new Resend(apiKey);
-  }
-  return resendInstance;
+  return apiKey || null;
 }
 
 /**
@@ -298,9 +288,9 @@ Manager Kalpna Kumari: +91 9355135904
 export async function sendFormNotification(
   payload: FormNotificationPayload
 ): Promise<EmailSendResult> {
-  const resend = getResendClient();
+  const apiKey = getResendApiKey();
 
-  if (!resend) {
+  if (!apiKey) {
     console.warn(
       '⚠️ RESEND_API_KEY environment variable is not set. Email notification skipped, but form data was safely persisted in Firestore.'
     );
@@ -342,7 +332,7 @@ export async function sendFormNotification(
   }
 
   try {
-    const sendOptions: Parameters<typeof resend.emails.send>[0] = {
+    const requestBody: Record<string, any> = {
       from: fromEmail,
       to: [toEmail],
       subject,
@@ -352,16 +342,26 @@ export async function sendFormNotification(
 
     // If visitor provided a valid email address, set it as reply_to so the admin can reply directly!
     if (payload.email && payload.email.includes('@')) {
-      sendOptions.replyTo = payload.email.trim();
+      requestBody.reply_to = payload.email.trim();
+      requestBody.replyTo = payload.email.trim();
     }
 
-    const { data, error } = await resend.emails.send(sendOptions);
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-    if (error) {
-      console.error('Resend API returned error:', error);
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      console.error('Resend API returned error:', data);
       return {
         success: false,
-        error: error.message || 'Resend API error',
+        error: data?.message || data?.error || `Resend HTTP ${response.status}`,
       };
     }
 
