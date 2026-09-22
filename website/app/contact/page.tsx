@@ -4,8 +4,9 @@ import { PageHeader } from '@/components/PageHeader';
 import { LeadershipCards } from '@/components/LeadershipCards';
 import { INITIAL_BRANCHES } from '@/lib/seedData';
 import { formatPhone } from '@/lib/utils';
-import { Phone, Mail, MapPin, Building2, Clock, ExternalLink } from 'lucide-react';
+import { Phone, Mail, MapPin, Building2, Clock, ExternalLink, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { ContactFormClient } from './ContactFormClient';
 
 export const metadata: Metadata = {
   title: 'Contact Us & Campus Directory | Siddhartha International Schools',
@@ -33,39 +34,58 @@ export default function ContactPage() {
           <LeadershipCards />
         </section>
 
-        {/* Central Secretariat Info */}
-        <section className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-base">Central Secretariat Address</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Siddhartha International Group of Schools, Central Corporate Office, Sector 14, Old Judicial Complex Zone, Gurugram, Haryana 122001, India.
+        {/* Contact Form & Quick Help Section */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div>
+              <span className="px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-extrabold uppercase tracking-wider">
+                Direct Dispatch
+              </span>
+              <h2 className="text-2xl font-bold text-slate-900 mt-2">
+                Send a Message to Directorate
+              </h2>
+              <p className="text-xs text-slate-600 mt-1">
+                Your message is immediately logged and routed directly to the principal or directorate inbox.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-sky-500 text-slate-950 flex items-center justify-center font-bold">
-                <Clock className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-base">Office & Visitor Timings</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Monday to Saturday: 8:00 AM to 3:30 PM<br />
-                Sunday: Closed (Helpline available by prior appointment)
-              </p>
-            </div>
+            <ContactFormClient />
+          </div>
 
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold">
-                <Mail className="w-5 h-5" />
+          <div className="lg:col-span-5 space-y-6">
+            {/* Quick Contact Overview */}
+            <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6">
+              <h3 className="font-bold text-lg text-white">Central Secretariat</h3>
+              
+              <div className="space-y-4 text-xs text-slate-300">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block mb-0.5">Headquarters Address</strong>
+                    <span>Sector 14, Old Judicial Complex Zone, Gurugram, Haryana 122001, India</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="w-4 h-4 text-sky-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block mb-0.5">Visiting Timings</strong>
+                    <span>Monday to Saturday: 8:00 AM – 3:30 PM<br />Sunday: Closed</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Mail className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block mb-0.5">Official Correspondence</strong>
+                    <span>info@siddharthaschools.edu.in<br />admissions@siddharthaschools.edu.in</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="font-bold text-white text-base">Email & Correspondence</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                General Queries: <a href="mailto:info@siddharthaschools.edu.in" className="text-amber-400 hover:underline">info@siddharthaschools.edu.in</a><br />
-                Admissions: <a href="mailto:admissions@siddharthaschools.edu.in" className="text-amber-400 hover:underline">admissions@siddharthaschools.edu.in</a>
-              </p>
+
+              <div className="pt-4 border-t border-slate-800 text-xs text-slate-400">
+                Urgent enquiry? Call Director Sandeep Kumar directly at <a href="tel:8368268149" className="text-amber-400 font-bold font-mono">8368268149</a>.
+              </div>
             </div>
           </div>
         </section>

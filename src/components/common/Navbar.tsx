@@ -175,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenEnquiry }) => {
                     : 'text-slate-700 hover:text-amber-700 hover:bg-slate-50'
                 }`}
               >
-                Leadership
+                Leadership & Staff
               </Link>
 
               {/* Academics Dropdown */}
@@ -380,9 +380,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenEnquiry }) => {
               <Link
                 to="/leadership"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-50"
+                className="block px-3 py-2 rounded-lg text-slate-800 hover:bg-slate-50 font-semibold"
               >
-                Leadership (Director & Manager)
+                Leadership & Staff
               </Link>
               
               <div className="pt-2 pb-1 text-xs font-bold text-slate-400 uppercase tracking-wider px-3">

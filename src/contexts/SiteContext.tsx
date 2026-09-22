@@ -138,9 +138,20 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const unsubStaff = onSnapshot(collection(db, 'staff'), (snapshot) => {
           if (!snapshot.empty) {
             const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Staff));
-            setStaff(list);
+            const hasCentral = list.some(s => s.staffType === 'central' || s.isLeadership || (!s.branchId && (s.designation?.toLowerCase().includes('director') || s.name?.toLowerCase().includes('sandeep'))));
+            if (!hasCentral) {
+              const centralDefaults = INITIAL_STAFF.filter(s => s.staffType === 'central');
+              setStaff([...centralDefaults, ...list]);
+            } else {
+              setStaff(list);
+            }
+          } else {
+            setStaff(INITIAL_STAFF);
           }
-        }, (err) => console.warn('Staff listener error:', err));
+        }, (err) => {
+          console.warn('Staff listener error:', err);
+          setStaff(INITIAL_STAFF);
+        });
         unsubs.push(unsubStaff);
 
         // Events
@@ -302,20 +313,25 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const saveStaff = async (staffData: Partial<Staff>): Promise<string | void> => {
+    const staffType = staffData.staffType || (staffData.branchId ? 'branch' : 'central');
+    const branchId = staffType === 'central' ? null : (staffData.branchId || null);
+    const cleanedData: Partial<Staff> = {
+      ...staffData,
+      staffType,
+      branchId,
+      updatedAt: new Date().toISOString(),
+    };
+
     if (staffData.id && !staffData.id.startsWith('temp-')) {
       const id = staffData.id;
-      const { id: _, ...rest } = staffData;
-      await setDoc(doc(db, 'staff', id), {
-        ...rest,
-        updatedAt: new Date().toISOString(),
-      }, { merge: true });
+      const { id: _, ...rest } = cleanedData;
+      await setDoc(doc(db, 'staff', id), rest, { merge: true });
       return id;
     } else {
-      const { id: _, ...rest } = staffData;
+      const { id: _, ...rest } = cleanedData;
       const docRef = await addDoc(collection(db, 'staff'), {
         ...rest,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
       return docRef.id;
     }
@@ -440,7 +456,41 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const removeNotice = deleteNotice;
 
   // Enquiries
-  const submitEnquiry = async (enquiryData: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>): Promise<string> => {
+  const submitEnquiry = async (
+    enquiryData: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'> & {
+      formType?: 'admission' | 'quick_enquiry' | 'branch_enquiry' | 'contact' | string;
+      subject?: string;
+    }
+  ): Promise<string> => {
+    try {
+      const res = await fetch('/api/send-form-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formType: enquiryData.formType || 'admission',
+          studentName: enquiryData.studentName,
+          parentName: enquiryData.parentName,
+          name: enquiryData.studentName || enquiryData.parentName,
+          mobile: enquiryData.mobile,
+          email: enquiryData.email,
+          classGrade: enquiryData.classGrade,
+          preferredBranchId: enquiryData.preferredBranchId,
+          preferredBranchName: enquiryData.preferredBranchName,
+          board: enquiryData.board,
+          subject: enquiryData.subject,
+          message: enquiryData.message,
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.firestoreId) {
+          return json.firestoreId;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('API route call fallback to direct Firestore:', apiErr);
+    }
+
     const docRef = await addDoc(collection(db, 'enquiries'), {
       ...enquiryData,
       status: 'new',

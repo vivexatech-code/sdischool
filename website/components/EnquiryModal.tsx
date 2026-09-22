@@ -50,6 +50,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
       const branchName = selectedBranch ? selectedBranch.name : 'Central Campus';
 
       await submitAdmissionEnquiry({
+        formType: preselectedBranchId ? 'branch_enquiry' : 'quick_enquiry',
         studentName: studentName.trim(),
         parentName: parentName.trim(),
         mobile: cleanMobile,

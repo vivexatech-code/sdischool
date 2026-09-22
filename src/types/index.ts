@@ -1,3 +1,12 @@
+export interface BranchLeadership {
+  name: string;
+  designation?: string; // Default: 'Leader'
+  description?: string;
+  phone?: string;
+  photoUrl?: string;
+  cloudinaryPublicId?: string;
+}
+
 export interface Branch {
   id: string;
   name: string;
@@ -10,6 +19,7 @@ export interface Branch {
   classes: string;
   medium: string;
   description: string;
+  branchLeadership?: BranchLeadership;
   principalName?: string;
   principalPhone?: string;
   principalQualification?: string;
@@ -35,15 +45,19 @@ export interface Staff {
   name: string;
   role?: string;
   designation: 'Principal' | 'Vice Principal' | 'Coordinator' | 'Teacher' | 'Administrative Staff' | 'Other Staff' | string;
-  photoUrl: string;
-  cloudinaryPublicId?: string;
-  qualification: string;
-  experience?: string | number;
+  description?: string;
   shortBio?: string;
-  branchId: string;
-  branchName?: string;
   phone?: string;
   email?: string;
+  department?: string;
+  photoUrl: string;
+  cloudinaryPublicId?: string;
+  staffType?: 'central' | 'branch';
+  branchId?: string | null;
+  branchName?: string;
+  qualification?: string;
+  experienceYears?: number;
+  experience?: string | number;
   displayOrder?: number;
   isActive?: boolean;
   isLeadership?: boolean;
@@ -117,10 +131,14 @@ export interface AdmissionEnquiry {
   preferredBranchName?: string;
   board: string;
   message?: string;
+  subject?: string;
+  formType?: 'admission' | 'quick_enquiry' | 'branch_enquiry' | 'contact' | string;
   status: 'new' | 'contacted' | 'follow_up' | 'converted' | 'closed' | 'New' | 'Contacted' | 'Closed' | string;
   adminNotes?: string;
   createdAt: string;
   updatedAt?: string;
+  emailNotificationStatus?: 'sent' | 'failed' | 'not_configured';
+  emailNotificationError?: string;
 }
 
 export interface SiteSettings {

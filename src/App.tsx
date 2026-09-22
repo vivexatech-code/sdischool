@@ -33,6 +33,7 @@ import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminLayout } from './pages/admin/AdminLayout';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminBranchesPage } from './pages/admin/AdminBranchesPage';
+import { AdminLeadershipPage } from './pages/admin/AdminLeadershipPage';
 import { AdminStaffPage } from './pages/admin/AdminStaffPage';
 import { AdminEventsPage } from './pages/admin/AdminEventsPage';
 import { AdminGalleryPage } from './pages/admin/AdminGalleryPage';
@@ -52,6 +53,8 @@ export default function App() {
               <Route index element={<HomePage />} />
               <Route path="about" element={<AboutPage />} />
               <Route path="leadership" element={<LeadershipPage />} />
+              <Route path="staff" element={<LeadershipPage />} />
+              <Route path="faculty" element={<LeadershipPage />} />
               <Route path="academics" element={<AcademicsPage />} />
               <Route path="cbse" element={<CbsePage />} />
               <Route path="hbse" element={<HbsePage />} />
@@ -85,6 +88,7 @@ export default function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
+              <Route path="leadership" element={<AdminLeadershipPage />} />
               <Route path="branches" element={<AdminBranchesPage />} />
               <Route path="staff" element={<AdminStaffPage />} />
               <Route path="events" element={<AdminEventsPage />} />

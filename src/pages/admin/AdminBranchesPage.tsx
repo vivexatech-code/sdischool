@@ -17,7 +17,8 @@ import {
   Compass,
   FileText,
   Search,
-  Globe
+  Globe,
+  User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ImageUpload } from '../../components/admin/ImageUpload';
@@ -48,6 +49,14 @@ export const AdminBranchesPage: React.FC = () => {
       principalName: '',
       principalQualification: 'M.Sc., M.Ed.',
       principalPhone: '8368268149',
+      branchLeadership: {
+        name: '',
+        designation: 'Leader',
+        description: '',
+        phone: '8368268149',
+        photoUrl: '',
+        cloudinaryPublicId: '',
+      },
       facilities: ['Smart Classrooms', 'Composite Science Lab', 'Sports Ground', 'GPS Bus Fleet'],
       imageUrl: '',
       cloudinaryPublicId: '',
@@ -70,6 +79,21 @@ export const AdminBranchesPage: React.FC = () => {
       seoDescription: b.seoDescription || '',
       seoImage: b.seoImage || '',
       medium: b.medium || 'English',
+      branchLeadership: b.branchLeadership ? {
+        name: b.branchLeadership.name || b.principalName || '',
+        designation: b.branchLeadership.designation || 'Leader',
+        description: b.branchLeadership.description || '',
+        phone: b.branchLeadership.phone || b.principalPhone || '8368268149',
+        photoUrl: b.branchLeadership.photoUrl || '',
+        cloudinaryPublicId: b.branchLeadership.cloudinaryPublicId || '',
+      } : {
+        name: b.principalName || '',
+        designation: 'Leader',
+        description: '',
+        phone: b.principalPhone || '8368268149',
+        photoUrl: '',
+        cloudinaryPublicId: '',
+      },
     });
     setFacilitiesInput(b.facilities ? b.facilities.join(', ') : '');
     setUrlValidationError(null);
@@ -117,12 +141,26 @@ export const AdminBranchesPage: React.FC = () => {
         formattedMapsUrl = `https://${formattedMapsUrl}`;
       }
 
+      const leadership = {
+        name: editingBranch.branchLeadership?.name || editingBranch.principalName || '',
+        designation: (editingBranch.branchLeadership?.designation || 'Leader').trim() || 'Leader',
+        description: editingBranch.branchLeadership?.description || '',
+        phone: editingBranch.branchLeadership?.phone || editingBranch.principalPhone || '',
+        photoUrl: editingBranch.branchLeadership?.photoUrl || '',
+        cloudinaryPublicId: editingBranch.branchLeadership?.cloudinaryPublicId || '',
+      };
+
       await saveBranch({
         ...editingBranch,
         slug: generatedSlug,
         businessProfileUrl: formattedBusinessUrl,
         googleMapsUrl: formattedMapsUrl,
         facilities: facilitiesArray,
+        branchLeadership: leadership,
+        // Backward-compatible fields
+        principalName: leadership.name || editingBranch.principalName || '',
+        principalPhone: leadership.phone || editingBranch.principalPhone || '',
+        principalQualification: editingBranch.principalQualification || leadership.designation || 'M.Sc., M.Ed.',
       } as Branch);
 
       setIsModalOpen(false);
@@ -478,11 +516,11 @@ export const AdminBranchesPage: React.FC = () => {
                 />
               </div>
 
-              {/* 5. Description & Leadership */}
+              {/* 5. Description & Facilities */}
               <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
                   <FileText className="w-4 h-4 text-amber-600" />
-                  <span>Description & Branch Leadership</span>
+                  <span>Campus Facilities & Description</span>
                 </h3>
 
                 <div>
@@ -506,40 +544,201 @@ export const AdminBranchesPage: React.FC = () => {
                     className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-200">
+              {/* 6. Branch Leadership & Profile Photo */}
+              <div className="bg-slate-50/70 rounded-2xl p-5 border border-slate-200/80 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <User className="w-4 h-4 text-amber-600" />
+                    <span>Branch Leadership</span>
+                  </h3>
+                  <span className="text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                    Leader Profile
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Principal Name</label>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Leadership Title / Designation *
+                    </label>
                     <input
                       type="text"
-                      value={editingBranch.principalName || ''}
-                      onChange={(e) => setEditingBranch({ ...editingBranch, principalName: e.target.value })}
-                      placeholder="Principal full name"
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                      required
+                      value={editingBranch.branchLeadership?.designation ?? 'Leader'}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingBranch(prev => {
+                          if (!prev) return null;
+                          const currentLeadership = prev.branchLeadership || {
+                            name: prev.principalName || '',
+                            designation: 'Leader',
+                            phone: prev.principalPhone || '8368268149',
+                            photoUrl: '',
+                            cloudinaryPublicId: '',
+                          };
+                          return {
+                            ...prev,
+                            branchLeadership: {
+                              ...currentLeadership,
+                              designation: val,
+                            },
+                          };
+                        });
+                      }}
+                      placeholder="e.g. Leader, Principal, Head of School, Branch Director"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-medium"
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Defaults to &ldquo;Leader&rdquo;. Can be Principal, Head of School, Academic Head, Director, etc.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Leader&apos;s Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingBranch.branchLeadership?.name ?? editingBranch.principalName ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingBranch(prev => {
+                          if (!prev) return null;
+                          const currentLeadership = prev.branchLeadership || {
+                            name: '',
+                            designation: 'Leader',
+                            phone: prev.principalPhone || '8368268149',
+                            photoUrl: '',
+                            cloudinaryPublicId: '',
+                          };
+                          return {
+                            ...prev,
+                            principalName: val,
+                            branchLeadership: {
+                              ...currentLeadership,
+                              name: val,
+                            },
+                          };
+                        });
+                      }}
+                      placeholder="e.g. Mrs. Sunita Sharma"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Leader Direct Contact Phone
+                    </label>
+                    <input
+                      type="text"
+                      value={editingBranch.branchLeadership?.phone ?? editingBranch.principalPhone ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditingBranch(prev => {
+                          if (!prev) return null;
+                          const currentLeadership = prev.branchLeadership || {
+                            name: prev.principalName || '',
+                            designation: 'Leader',
+                            phone: '',
+                            photoUrl: '',
+                            cloudinaryPublicId: '',
+                          };
+                          return {
+                            ...prev,
+                            principalPhone: val,
+                            branchLeadership: {
+                              ...currentLeadership,
+                              phone: val,
+                            },
+                          };
+                        });
+                      }}
+                      placeholder="e.g. 8368268149"
+                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Principal Qualification</label>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Qualifications / Accreditations
+                    </label>
                     <input
                       type="text"
                       value={editingBranch.principalQualification || ''}
                       onChange={(e) => setEditingBranch({ ...editingBranch, principalQualification: e.target.value })}
-                      placeholder="M.Sc., M.Ed., Ph.D."
+                      placeholder="e.g. M.Sc. (Physics), B.Ed., 18+ Yrs Experience"
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
                     />
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">Principal Direct Phone</label>
-                    <input
-                      type="text"
-                      value={editingBranch.principalPhone || ''}
-                      onChange={(e) => setEditingBranch({ ...editingBranch, principalPhone: e.target.value })}
-                      placeholder="Direct mobile"
-                      className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
-                    />
-                  </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Leader Biography / Message
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={editingBranch.branchLeadership?.description || ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditingBranch(prev => {
+                        if (!prev) return null;
+                        const currentLeadership = prev.branchLeadership || {
+                          name: prev.principalName || '',
+                          designation: 'Leader',
+                          phone: prev.principalPhone || '8368268149',
+                          photoUrl: '',
+                          cloudinaryPublicId: '',
+                        };
+                        return {
+                          ...prev,
+                          branchLeadership: {
+                            ...currentLeadership,
+                            description: val,
+                          },
+                        };
+                      });
+                    }}
+                    placeholder="Short leadership message, educational philosophy, or background note..."
+                    className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
+                  />
+                </div>
+
+                {/* Profile Photo Upload via Cloudinary */}
+                <div className="pt-2 border-t border-slate-200">
+                  <ImageUpload
+                    label="Leader Profile Photo (Cloudinary)"
+                    helperText="Upload official portrait of the campus leader. Supports JPG, PNG, WEBP (Square portrait recommended)."
+                    value={editingBranch.branchLeadership?.photoUrl || ''}
+                    publicId={editingBranch.branchLeadership?.cloudinaryPublicId || ''}
+                    folder="schools/leadership"
+                    aspectRatio="square"
+                    onChange={({ imageUrl, cloudinaryPublicId }) => {
+                      setEditingBranch(prev => {
+                        if (!prev) return null;
+                        const currentLeadership = prev.branchLeadership || {
+                          name: prev.principalName || '',
+                          designation: 'Leader',
+                          phone: prev.principalPhone || '8368268149',
+                          photoUrl: '',
+                          cloudinaryPublicId: '',
+                        };
+                        return {
+                          ...prev,
+                          branchLeadership: {
+                            ...currentLeadership,
+                            photoUrl: imageUrl,
+                            cloudinaryPublicId: cloudinaryPublicId || currentLeadership.cloudinaryPublicId,
+                          },
+                        };
+                      });
+                    }}
+                  />
                 </div>
               </div>
 

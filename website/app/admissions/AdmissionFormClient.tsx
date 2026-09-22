@@ -35,6 +35,7 @@ export const AdmissionFormClient: React.FC = () => {
       const branchName = selectedBranch ? selectedBranch.name : 'Central Campus';
 
       await submitAdmissionEnquiry({
+        formType: 'admission',
         studentName: studentName.trim(),
         parentName: parentName.trim(),
         mobile: cleanMobile,

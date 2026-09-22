@@ -26,7 +26,7 @@ import {
   Layers,
   FileCheck
 } from 'lucide-react';
-import { getBranches, getEvents, getNotices, getGallery } from '@/lib/firestore';
+import { getBranches, getEvents, getNotices, getGallery, getStaff } from '@/lib/firestore';
 import { BranchCard } from '@/components/BranchCard';
 import { EventCard } from '@/components/EventCard';
 import { LeadershipCards } from '@/components/LeadershipCards';
@@ -35,11 +35,12 @@ import { BranchDiscovery } from '@/components/BranchDiscovery';
 import { formatPhone, isNoticeActive } from '@/lib/utils';
 
 export default async function HomePage() {
-  const [branches, events, notices, gallery] = await Promise.all([
+  const [branches, events, notices, gallery, staff] = await Promise.all([
     getBranches(),
     getEvents(),
     getNotices(),
     getGallery(),
+    getStaff(),
   ]);
 
   // Filter active notices
@@ -672,7 +673,7 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <LeadershipCards />
+        <LeadershipCards staff={staff} />
       </section>
 
       {/* 10. CAMPUS FACILITIES & INFRASTRUCTURE */}

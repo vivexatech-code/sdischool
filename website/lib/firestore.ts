@@ -118,7 +118,13 @@ export async function getStaff(): Promise<Staff[]> {
     const colRef = collection(db, 'staff');
     const snapshot = await getDocs(colRef);
     if (!snapshot.empty) {
-      return snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Staff));
+      const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Staff));
+      const hasCentral = list.some(s => s.staffType === 'central' || s.isLeadership || (!s.branchId && (s.designation?.toLowerCase().includes('director') || s.name?.toLowerCase().includes('sandeep'))));
+      if (!hasCentral) {
+        const centralDefaults = INITIAL_STAFF.filter(s => s.staffType === 'central');
+        return [...centralDefaults, ...list];
+      }
+      return list;
     }
   } catch (error) {
     console.warn('Firestore getStaff fallback:', error);
@@ -143,11 +149,61 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 /**
- * Submit admission enquiry directly into Firestore
+ * Submit admission or contact enquiry via secure Next.js server API endpoint
+ * with fallback to direct Firestore save if API route is unavailable.
  */
 export async function submitAdmissionEnquiry(
-  data: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'>
+  data: Omit<AdmissionEnquiry, 'id' | 'createdAt' | 'status'> & {
+    formType?: 'admission' | 'quick_enquiry' | 'branch_enquiry' | 'contact' | string;
+    subject?: string;
+    name?: string;
+  }
 ): Promise<string> {
+  // First attempt: call secure Next.js server API route to validate, save to Firestore, and trigger Resend email
+  try {
+    const response = await fetch('/api/send-form-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        formType: data.formType || 'admission',
+        studentName: data.studentName,
+        parentName: data.parentName,
+        name: data.name || data.studentName || data.parentName,
+        mobile: data.mobile,
+        email: data.email,
+        classGrade: data.classGrade,
+        preferredBranchId: data.preferredBranchId,
+        preferredBranchName: data.preferredBranchName,
+        board: data.board,
+        subject: data.subject,
+        message: data.message,
+      }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      if (result.success) {
+        return result.firestoreId || 'success';
+      } else {
+        throw new Error(result.message || 'Submission failed on server');
+      }
+    } else {
+      const errJson = await response.json().catch(() => null);
+      if (errJson?.message) {
+        throw new Error(errJson.message);
+      }
+    }
+  } catch (apiErr: any) {
+    // If it's a specific validation error from the API, rethrow so user sees it
+    if (apiErr?.message && !apiErr.message.includes('fetch') && !apiErr.message.includes('network')) {
+      throw apiErr;
+    }
+    console.warn('API route call failed, falling back to direct Firestore save:', apiErr);
+  }
+
+  // Fallback: Direct Firestore save if API route is unreachable
   const colRef = collection(db, 'enquiries');
   const docRef = await addDoc(colRef, {
     ...data,

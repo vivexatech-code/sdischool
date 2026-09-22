@@ -16,7 +16,8 @@ import {
   X, 
   ExternalLink,
   Shield,
-  Sparkles
+  Sparkles,
+  Award
 } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
@@ -35,8 +36,9 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { label: 'Overview', path: '/admin', icon: LayoutDashboard },
-    { label: 'Branches (12)', path: '/admin/branches', icon: Building2 },
+    { label: 'Leadership', path: '/admin/leadership', icon: Award },
     { label: 'Staff Management', path: '/admin/staff', icon: Users },
+    { label: 'Branches (12)', path: '/admin/branches', icon: Building2 },
     { label: 'Events', path: '/admin/events', icon: Calendar },
     { label: 'Gallery Media', path: '/admin/gallery', icon: ImageIcon },
     { label: 'Notices & Circulars', path: '/admin/notices', icon: Bell },

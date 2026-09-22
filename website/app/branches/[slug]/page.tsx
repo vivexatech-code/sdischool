@@ -14,9 +14,11 @@ import {
   Award,
   Sparkles,
   ExternalLink,
-  Globe
+  Globe,
+  User,
+  MessageSquare
 } from 'lucide-react';
-import { getBranches, getBranchBySlug } from '@/lib/firestore';
+import { getBranches, getBranchBySlug, getStaff } from '@/lib/firestore';
 import { formatPhone } from '@/lib/utils';
 import { LeadershipCards } from '@/components/LeadershipCards';
 
@@ -64,11 +66,16 @@ export async function generateMetadata(
 
 export default async function BranchDetailPage({ params }: Props) {
   const { slug } = await params;
-  const branch = await getBranchBySlug(slug);
+  const [branch, allStaff] = await Promise.all([
+    getBranchBySlug(slug),
+    getStaff(),
+  ]);
 
   if (!branch) {
     notFound();
   }
+
+  const branchStaff = allStaff.filter(s => s.branchId === branch.id && s.isActive !== false);
 
   return (
     <div className="space-y-12 pb-20">
@@ -162,6 +169,162 @@ export default async function BranchDetailPage({ params }: Props) {
                     <span className="text-[11px] text-purple-800">History, Political Science, Psychology, Sociology & English Core</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Campus Leadership & Faculty Section */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+              <div>
+                <span className="px-2.5 py-1 rounded-md bg-amber-50 text-amber-900 text-[10px] font-extrabold uppercase tracking-wider border border-amber-200">
+                  Campus Administration & Faculty
+                </span>
+                <h2 className="text-xl font-bold text-slate-900 mt-2">Leadership & Faculty at {branch.sector} Campus</h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Experienced educational leaders and subject mentors dedicated to students at this campus.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Branch Leadership Card */}
+                {(() => {
+                  const leadership = branch.branchLeadership;
+                  const leaderName = leadership?.name || branch.principalName || 'Campus Leader';
+                  const designationTitle = leadership?.designation?.trim() || 'Leader';
+                  const leaderPhone = leadership?.phone || branch.principalPhone || branch.phone;
+                  const leaderPhoto = leadership?.photoUrl;
+                  const leaderDesc = leadership?.description || `Overseeing academic delivery, CBSE & HBSE adherence, student discipline, and parent consultations at ${branch.sector} campus.`;
+
+                  return (
+                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-50/40 via-white to-slate-50 border border-amber-200/80 shadow-xs space-y-4 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-950 uppercase tracking-wider border border-amber-300">
+                            Branch Leadership
+                          </span>
+                          <span className="text-[11px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            {branch.sector}
+                          </span>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                          {leaderPhoto ? (
+                            <img
+                              src={leaderPhoto}
+                              alt={leaderName}
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-300 shadow-md flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-900 text-amber-400 font-bold text-xl flex items-center justify-center flex-shrink-0 shadow-md border border-slate-700">
+                              <User className="w-8 h-8" />
+                            </div>
+                          )}
+
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-extrabold text-slate-900 text-base sm:text-lg leading-snug">
+                              {leaderName}
+                            </h3>
+                            <div className="inline-block px-2.5 py-0.5 mt-1 rounded-md bg-amber-500/10 text-amber-800 text-xs font-bold border border-amber-500/20">
+                              {designationTitle}
+                            </div>
+                            {branch.principalQualification && (
+                              <p className="text-[11px] text-slate-500 font-medium mt-1">
+                                {branch.principalQualification}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-slate-600 leading-relaxed bg-white/70 p-3 rounded-xl border border-slate-200/60">
+                          {leaderDesc}
+                        </p>
+                      </div>
+
+                      {leaderPhone && (
+                        <div className="pt-3 border-t border-amber-200/60 text-xs flex items-center justify-between">
+                          <a
+                            href={`tel:${leaderPhone}`}
+                            className="text-amber-800 hover:text-amber-900 font-bold flex items-center gap-1.5 font-mono"
+                          >
+                            <Phone className="w-3.5 h-3.5 text-amber-600" />
+                            <span>Direct Line: {formatPhone(leaderPhone)}</span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Additional Dynamic Branch Staff from Firestore */}
+                {branchStaff.map(st => {
+                  const initials = st.name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .slice(0, 2)
+                    .toUpperCase() || 'SIS';
+                  const cleanPhone = (st.phone || '').replace(/\D/g, '');
+
+                  return (
+                    <div
+                      key={st.id}
+                      className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          {st.photoUrl ? (
+                            <img
+                              src={st.photoUrl}
+                              alt={st.name}
+                              className="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 shadow-xs"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-slate-900 text-amber-400 font-bold text-base flex items-center justify-center flex-shrink-0 shadow-xs">
+                              {initials}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-700 uppercase">
+                              {st.designation}
+                            </span>
+                            <h3 className="font-bold text-slate-900 text-sm mt-0.5 truncate">{st.name}</h3>
+                            {st.department && (
+                              <p className="text-[11px] text-amber-700 font-semibold">{st.department}</p>
+                            )}
+                            {st.qualification && (
+                              <p className="text-[11px] text-slate-500 font-medium truncate">{st.qualification}</p>
+                            )}
+                          </div>
+                        </div>
+                        {(st.description || st.shortBio) && (
+                          <p className="text-xs text-slate-600 leading-relaxed italic line-clamp-3">
+                            "{st.description || st.shortBio}"
+                          </p>
+                        )}
+                      </div>
+
+                      {st.phone && (
+                        <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                          <a
+                            href={`tel:${st.phone}`}
+                            className="text-amber-700 font-bold flex items-center gap-1.5 font-mono"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>{formatPhone(st.phone)}</span>
+                          </a>
+                          <a
+                            href={`https://wa.me/91${cleanPhone}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 rounded-md border border-slate-200 text-emerald-700 hover:bg-emerald-50 transition-colors"
+                            title={`WhatsApp ${st.name}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

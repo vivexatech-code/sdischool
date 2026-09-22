@@ -678,6 +678,16 @@ export const HomePage: React.FC = () => {
           </div>
 
           <LeadershipCards />
+
+          <div className="text-center pt-8">
+            <Link
+              to="/leadership"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-800 font-bold text-xs hover:bg-slate-50 transition-colors shadow-xs"
+            >
+              <span>Explore Group Governance & Leadership Vision</span>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-600" />
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -21,7 +21,8 @@ import {
   ChevronRight,
   ShieldCheck,
   AlertCircle,
-  Globe
+  Globe,
+  MessageSquare
 } from 'lucide-react';
 
 export const BranchDetailPage: React.FC = () => {
@@ -233,55 +234,142 @@ export const BranchDetailPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Principal Card */}
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-slate-900 text-amber-400 font-bold text-lg flex items-center justify-center flex-shrink-0">
-                  <User className="w-6 h-6" />
+            {/* Branch Leadership Card */}
+            {(() => {
+              const leadership = branch.branchLeadership;
+              const leaderName = leadership?.name || branch.principalName || 'Campus Leader';
+              const designationTitle = leadership?.designation?.trim() || 'Leader';
+              const leaderPhone = leadership?.phone || branch.principalPhone || branch.phone;
+              const leaderPhoto = leadership?.photoUrl;
+              const leaderDesc = leadership?.description || `Overseeing day-to-day scholastic excellence, discipline, and parent consultations at the ${branch.sector} campus.`;
+
+              return (
+                <div className="bg-white rounded-2xl border-2 border-amber-200/80 p-6 shadow-sm space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-900 uppercase tracking-wider border border-amber-300">
+                        Branch Leadership
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded">
+                        {branch.sector}
+                      </span>
+                    </div>
+
+                    <div className="flex items-start gap-4">
+                      {leaderPhoto ? (
+                        <img
+                          src={getOptimizedImageUrl(leaderPhoto, { width: 140, height: 140, crop: 'thumb' })}
+                          alt={leaderName}
+                          className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-300 shadow-sm flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-2xl bg-slate-900 text-amber-400 font-bold text-lg flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-700">
+                          <User className="w-8 h-8" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-extrabold text-slate-900 text-base leading-snug">
+                          {leaderName}
+                        </h4>
+                        <div className="inline-block px-2.5 py-0.5 mt-1 rounded bg-amber-500/10 text-amber-800 text-xs font-bold border border-amber-500/20">
+                          {designationTitle}
+                        </div>
+                        {branch.principalQualification && (
+                          <p className="text-[11px] text-slate-500 font-medium mt-1">
+                            {branch.principalQualification}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      {leaderDesc}
+                    </p>
+                  </div>
+
+                  {leaderPhone && (
+                    <div className="pt-3 border-t border-slate-100 text-xs">
+                      <a
+                        href={`tel:${leaderPhone}`}
+                        className="text-amber-800 hover:text-amber-900 font-bold flex items-center gap-1.5 font-mono"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Direct Line: {formatPhone(leaderPhone)}</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 uppercase">
-                    Branch Leadership
-                  </span>
-                  <h4 className="font-bold text-slate-900 text-base mt-1">
-                    {branch.principalName || 'Branch Principal'}
-                  </h4>
-                  <p className="text-xs text-slate-500 font-medium">{branch.principalQualification || 'M.Sc., M.Ed.'}</p>
-                </div>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Overseeing day-to-day scholastic excellence, discipline, and parent consultations at the {branch.sector} campus.
-              </p>
-              {branch.principalPhone && (
-                <div className="pt-2 border-t border-slate-100 text-xs">
-                  <a href={`tel:${branch.principalPhone}`} className="text-amber-700 font-bold flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>Call: {formatPhone(branch.principalPhone)}</span>
-                  </a>
-                </div>
-              )}
-            </div>
+              );
+            })()}
 
             {/* Additional Staff if any in Firestore */}
-            {branchStaff.map(st => (
-              <div key={st.id} className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
-                <div className="flex items-center gap-4">
-                  <img
-                    src={getOptimizedImageUrl(st.photoUrl, { width: 120, height: 120, crop: 'thumb' })}
-                    alt={st.name}
-                    className="w-14 h-14 rounded-full object-cover border border-slate-200"
-                  />
-                  <div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 uppercase">
-                      {st.designation}
-                    </span>
-                    <h4 className="font-bold text-slate-900 text-base mt-1">{st.name}</h4>
-                    <p className="text-xs text-slate-500 font-medium">{st.qualification}</p>
+            {branchStaff.map(st => {
+              const initials = st.name
+                .split(' ')
+                .map(n => n[0])
+                .join('')
+                .slice(0, 2)
+                .toUpperCase() || 'SIS';
+              const cleanPhone = (st.phone || '').replace(/\D/g, '');
+
+              return (
+                <div key={st.id} className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      {st.photoUrl ? (
+                        <img
+                          src={getOptimizedImageUrl(st.photoUrl, { width: 120, height: 120, crop: 'thumb' })}
+                          alt={st.name}
+                          className="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-2xl bg-slate-900 text-amber-400 font-bold text-base flex items-center justify-center flex-shrink-0 border border-slate-800 shadow-xs">
+                          {initials}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 uppercase">
+                          {st.designation}
+                        </span>
+                        <h4 className="font-bold text-slate-900 text-base mt-1 truncate">{st.name}</h4>
+                        {st.department && (
+                          <p className="text-[11px] text-amber-700 font-semibold">{st.department}</p>
+                        )}
+                        {st.qualification && (
+                          <p className="text-xs text-slate-500 font-medium truncate">{st.qualification}</p>
+                        )}
+                      </div>
+                    </div>
+                    {(st.description || st.shortBio) && (
+                      <p className="text-xs text-slate-600 leading-relaxed italic line-clamp-3">
+                        "{st.description || st.shortBio}"
+                      </p>
+                    )}
                   </div>
+
+                  {st.phone && (
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <a
+                        href={`tel:${st.phone}`}
+                        className="text-xs font-bold text-slate-900 hover:text-amber-700 flex items-center gap-1.5 font-mono"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-amber-600" />
+                        <span>{formatPhone(st.phone)}</span>
+                      </a>
+                      <a
+                        href={`https://wa.me/91${cleanPhone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 rounded-lg border border-slate-200 text-emerald-700 hover:bg-emerald-50 transition-colors"
+                        title={`WhatsApp ${st.name}`}
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">{st.shortBio}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
